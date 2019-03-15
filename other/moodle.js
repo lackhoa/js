@@ -7,7 +7,7 @@ function processPost (post) {
     // Returns: the msg content, date, the author's name and the original date
     let parent    = getParent(post)
     let hasParent = (parent != undefined)
-    let parentDOM = hasParent ? stringToHTML(getHTML(parent)) : undefined
+    let parentDOM = hasParent ? getHighlighted(parent, stringToHTML(getHTML(parent))) : undefined
     return {
         content : getContent(post),
         author  : getAuthor(post),
@@ -19,7 +19,7 @@ function processPost (post) {
 }
 
 function getHTML(url) {
-    // Use caching for requests, otherwise it's kinda illegal
+    // Use caching for requests, otherwise it's kinda foul play
     if (getHTML[url]) {return getHTML[url];}
 
     // Returns the HTML as string
@@ -35,7 +35,6 @@ function stringToHTML(s) {
     // Use caching for requests, for performance
     if (stringToHTML[s]) {return stringToHTML[s];}
 
-    // Returns: the author, and date of the post
     // A dummy html object to store the file
     var dummyObject = document.createElement('div')
     dummyObject.innerHTML = s
@@ -43,8 +42,15 @@ function stringToHTML(s) {
     return dummyObject
 }
 
+function getHighlighted(url, DOM) {
+    // The highlighted anchor's css id is included in the url
+    let h   = url.match(/#.*/g)[0]
+    let a   = DOM.querySelector(h)
+    return a.nextElementSibling
+}
+
 function getParent(post) {
-    // Returns the HTML to the parent
+    // Returns the url to the parent
     let commands = post.getElementsByClassName("commands")[0]
     let as       = commands.getElementsByTagName("a")
     return (as.length === 1) ? undefined : as[1].getAttribute("href")
@@ -66,9 +72,11 @@ function getContent(post) {
 }
 
 // How to run the code
-// Use the "date" fields in advanced search (don't fill out anything)
+// Use the "older than date" fields in advanced search
 // set "&perpage=1000" in the url
+// Store the result in a variable: patiently wait until something appears
+// temp = main()
 // to inspect as table
-// console.table(main())
-// To copy
-// copy(main())
+// console.table(temp)
+// Copy the result to clipboard
+// copy(temp)
